@@ -40,6 +40,7 @@ Page {
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
+
         anchors.fill: parent
 
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
@@ -78,15 +79,16 @@ Page {
 
             }
             Label {
-                text:getStatusText()
-                id:statusLabel
-
-            }
-            Label {
                 text:getUrlText()
                 id:urlLabek
 
             }
+            Label {
+                text:getStatusText()
+                id:statusLabel
+
+            }
+
         }
     }
 }

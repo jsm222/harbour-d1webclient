@@ -1,7 +1,7 @@
 #include "webclient.h"
 Webclient::Webclient(QObject *parent) : QObject(parent)
 {
-    _mSettings = new QSettings("computer.schmitz", "computer.schmitz.harbour-d1webclient");
+    _mSettings = new QSettings("harbour-d1webclient", "harbour-d1webclient");
 }
 void Webclient::webConnect(QString command) {
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
@@ -9,16 +9,13 @@ void Webclient::webConnect(QString command) {
     manager->get(QNetworkRequest(QUrl(value("webclient/baseUrl").toString()+value("webclient/path").toString()+value("webclient/query"+command).toString())));
 }
 
-void Webclient::requestReceived(QNetworkReply* reply) {
-    QString respBodySnip ="";
+void Webclient::requestReceived(QNetworkReply* reply)
+{
     QVariant status =  reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     if(status.toInt() != 200 && status.toInt() != 404) {
         status = QVariant();
         status.setValue(reply->error());
 
-    } else {
-
-      //respBody = QString(reply->readAll());
     }
     emit(Webclient::received(reply->request().url().path() + " " + reply->request().url().query(), status.toString()));
 }
