@@ -30,66 +30,155 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-
-
 Page {
-    id: page
-
-    // The effective value will be restricted by ApplicationWindow.allowedOrientations
-    allowedOrientations: Orientation.All
-
-    // To enable PullDownMenu, place our content in a SilicaFlickable
-    SilicaFlickable {
-
-        anchors.fill: parent
-
-        // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("Settings")
-                onClicked: pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
-            }
-        }
-
-        // Tell SilicaFlickable the height of its content.
-        contentHeight: column.height
-
-        // Place our content in a Column.  The PageHeader is always placed at the top
-        // of the page, followed by our content.
-        Column {
-            id: column
-
+    // The delegate for each section header
+    Component {
+        id: sectionHeading
+        Rectangle {
             width: page.width
-            spacing: Theme.paddingLarge
-
-           PageHeader {
-                title: qsTr("Remote control")
-
+            height: childrenRect.height
+            color: listView.hSection == section ? Theme.primaryColor : Theme.secondaryColor
+            Text {
+                text:section
+                font.bold: true
+                font.pixelSize: 20
             }
-            Button {
-                id:buttonOn
-                text:'On'
-                onClicked: webClient.webConnect("On");
 
-            }
-            Button {
-                id:buttonOff
-                text:'Off'
-                onClicked: webClient.webConnect("Off");
-
-            }
-            Label {
-                text:getUrlText()
-                id:urlLabek
-
-            }
-            Label {
-                text:getStatusText()
-                id:statusLabel
-
-            }
 
         }
     }
-}
 
+
+
+
+    id: page
+    allowedOrientations: Orientation.All
+    SilicaListView {
+        property int hButtonId;
+        property string hSection:"";
+        VerticalScrollDecorator {}
+
+        model:bModel
+        header:PageHeader {
+            title: qsTr("Remote Control")
+        }
+        BusyIndicator {
+            size:BusyIndicatorSize.Large
+            id:bIndicator
+            anchors.centerIn: parent
+            running: false
+        }
+
+        RemorsePopup { id: remorse }
+
+        PullDownMenu {
+            width:page.width
+
+            MenuItem {
+                text: qsTr("Add control")
+                onClicked: {
+                    setIndex(bModel.nextIndex())
+
+                    setListIndex(-1)
+                    setAction("Add")
+                    pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
+                }
+            }
+            MenuItem {
+                text: qsTr("Open external browser")
+                onClicked: {
+                    Qt.openUrlExternally(settings.value("webclient%1/getUrl".arg(listView.hButtonId)))
+                }
+            }
+            MenuItem {
+                text: qsTr("Remove section")
+                visible: listView.hSection !== "";
+                onClicked: {
+                    var cHsection = listView.hSection;
+                    if(cHsection !== "") {
+                        remorse.execute("Removing section " + cHsection, function() { bModel.removeSection(cHsection);});
+                    }
+                }
+            }
+        }
+
+        anchors.fill: parent
+
+        width:page.width
+        id:listView
+
+
+
+        delegate: ListItem {
+            RemorseItem { id: remorseItem }
+            function showRemorseItem() {
+
+
+            remorseItem.execute(lItem,"Removing",function() {
+                 setAction("Remove");
+                var cIdx = index,cBid = buttonId;
+                settings.remove(parseInt(cBid));bModel.removeRows(cIdx,1);
+
+            },3000);
+            }
+            id:lItem
+            width:page.width
+            onClicked:{
+                bIndicator.running = true
+                webclient.webConnect(buttonId,index);
+                listView.currentIndex = index;
+                listView.hButtonId = buttonId;
+                listView.hSection = section;
+            }
+            menu:ContextMenu {
+                closeOnActivation: true
+
+                id:cMenu
+                MenuItem {
+                    text: qsTr("Edit")
+                    onClicked: { setAction("edit");setIndex(parseInt(buttonId)); setListIndex(index); pageStack.push(Qt.resolvedUrl("SecondPage.qml"));
+
+                    }
+                }
+
+                MenuItem {
+                    text: qsTr("Copy")
+                    onClicked: {
+                        setListIndex(-1);
+                        setAction("copy");
+                        setIndex(parseInt(buttonId))
+                        pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
+                    }
+                }
+                MenuItem {
+                    text: qsTr("Remove")
+                    onClicked: {
+                       showRemorseItem()
+
+                    }
+                }
+            }
+            Label {
+                width:Theme.buttonWidthSmall
+                text: buttonText
+                color:listView.currentIndex === index ? Theme.primaryColor : Theme.secondaryColor
+            }
+            Label {
+                x:parent.x + Theme.buttonWidthSmall
+                y:parent.y
+                text:status;
+            }
+
+        }
+
+        section.property: "section"
+        section.criteria: ViewSection.FullString
+        section.delegate: sectionHeading
+
+    }
+    Connections {
+        target: webclient
+        onHttpDone:bIndicator.running=false;
+
+    }
+}

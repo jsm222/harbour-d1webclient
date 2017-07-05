@@ -14,14 +14,18 @@ TARGET = harbour-d1webclient
 
 CONFIG += sailfishapp
 
+
+
 SOURCES += src/harbour-d1webclient.cpp \
-    src/webclient.cpp
+    src/webclient.cpp \
+    src/settings.cpp \
+    src/controllistmodel.cpp \
+    src/webcontrol.cpp
 
 OTHER_FILES += qml/harbour-d1webclient.qml \
     qml/cover/CoverPage.qml \
     qml/pages/FirstPage.qml \
     qml/pages/SecondPage.qml \
-    rpm/harbour-d1webclient.changes.in \
     rpm/harbour-d1webclient.spec \
     rpm/harbour-d1webclient.yaml \
     translations/*.ts \
@@ -40,11 +44,16 @@ CONFIG += sailfishapp_i18n
 TRANSLATIONS += translations/harbour-d1webclient-de.ts
 
 HEADERS += \
-    src/webclient.h
+    src/webclient.h \
+    src/settings.h \
+    src/controllistmodel.h \
+    src/webcontrol.h
 
 DISTFILES += \
     icons/108x108/harbour-d1webclient.png \
     icons/128x128/harbour-d1webclient.png \
     icons/256x256/harbour-d1webclient.png \
     icons/86x86/harbour-d1webclient.png \
-    qml/cover/iot.svg
+    qml/cover/iot.svg \
+    qml/pages/ThirdPage.qml \
+    rpm/harbour-d1webclient.changes

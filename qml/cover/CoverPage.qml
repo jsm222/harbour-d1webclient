@@ -33,17 +33,28 @@ import Sailfish.Silica 1.0
 
 CoverBackground {
     id:mCover
-    Image{
-           source: "iot.svg"
-           sourceSize.width: parent.width
+    Image {
+        source: "iot.svg"
+        sourceSize.width: parent.width
+        y: coverActionArea.y / 2 - height / 2
 
-           y: coverActionArea.y / 2 - height / 2
-   }
+    }
+    Item {
+        Timer {
+            id:timer;
+            interval: 500; running:false; repeat: true
+            onTriggered: { if(urlText.text === qsTr("Loading")+"...") {
+                urlText.text = qsTr("Loading");
+            } else {
+                    urlText.text += ".";
+            }
+        }
+        }
 
+     }
 
     Label {
         id: urlText
-        text:getUrlText()
         anchors.left: parent.left
         anchors.bottom: statusText.top
 
@@ -51,16 +62,17 @@ CoverBackground {
     Label {
         id: statusText
         anchors.centerIn: parent
-        text:getStatusText()
     }
     CoverActionList {
         id: coverAction
-
         CoverAction {
             id:off
             iconSource: "image://theme/icon-cover-cancel"
             onTriggered: {
-                webClient.webConnect("Off");
+                urlText.text = qsTr("Loading");
+                timer.start()
+                var bIndex = settings.value("CoverOff")
+                webclient.webConnect(bIndex,bModel.listIndex(bIndex));
 
             }
         }
@@ -69,12 +81,24 @@ CoverBackground {
             id:on
             iconSource: "image://theme/icon-cover-next"
             onTriggered: {
-                webClient.webConnect("On");
+                urlText.text = qsTr("Loading");
+                timer.start()
+                var bIndex = settings.value("CoverOn")
+                webclient.webConnect(bIndex,bModel.listIndex(bIndex));
 
 
             }
         }
+    }
+    Connections {
+        target: webclient
+        onReceived: {
+            timer.stop();
+            statusText.text = status;
 
+
+            urlText.text=query;
+        }
     }
 
 }
