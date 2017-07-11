@@ -2,52 +2,90 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>CoverPage</name>
+    <message>
+        <source>Loading</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FirstPage</name>
     <message>
-        <source>Settings</source>
+        <source>Remote Control</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remote control</source>
+        <source>Add control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open external browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove section</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SecondPage</name>
     <message>
-        <source>Settings</source>
+        <source>Section text:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Base url:</source>
+        <source>On</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>http://192.168.1.1/</source>
+        <source>Section</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>path:</source>
+        <source>Request settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>/LED</source>
+        <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>query on</source>
+        <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>?ACTION=ON</source>
+        <source>DefaultSection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>query off</source>
+        <source>New control %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>?ACTION=OFF</source>
+        <source>Url</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThirdPage</name>
+    <message>
+        <source>Output</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

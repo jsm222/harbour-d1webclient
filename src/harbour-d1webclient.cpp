@@ -30,17 +30,19 @@
 
 #ifdef QT_QML_DEBUG
 #include <QtQuick>
-
 #endif
 #include "webclient.h"
+#include "controllistmodel.h"
+#include "settings.h"
 #include <QGuiApplication>
 #include <sailfishapp.h>
-#include <QtQuick>
+#include <QtQuick/QQuickView>
+#include <QDebug>
 #include <QtNetwork>
 #include <QUrl>
 int main(int argc, char *argv[])
 {
-    qmlRegisterType<Webclient>("harbour.computer.schmitz", 1, 0, "Webclient");
+
     // SailfishApp::main() will display "qml/template.qml", if you need more
     // control over initialization, you can use:
     //
@@ -49,15 +51,42 @@ int main(int argc, char *argv[])
     //   - SailfishApp::pathTo(QString) to get a QUrl to a resource file
     //
     // To display the view, call "show()" (will show fullscreen on device).
-      //QGuiApplication *app = SailfishApp::application(argc,argv);
+    Settings *settings = new Settings();
+
+    if(settings->getSettings()->value("webclient/baseUrl","").toString() != "") {
+        settings->setValue("webclient0/getUrl",settings->value("webclient/baseUrl").toString() + settings->value("webclient/path").toString()+settings->value("webclient/queryOn").toString());
+        settings->setValue("webclient0/buttonText","On");
+        settings->setValue("webclient0/sectionHeader","DefaultSection");
+        settings->setValue("webclient1/getUrl",settings->value("webclient/baseUrl").toString() + settings->value("webclient/path").toString()+settings->value("webclient/queryOff").toString());
+        settings->setValue("webclient1/buttonText","Off");
+        settings->setValue("webclient1/sectionHeader","DefaultSection");
+        settings->setValue("CoverOn","0");
+        settings->setValue("CoverOff","1");
+        settings->getSettings()->remove("webclient");
+    }
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc,argv));
-     QScopedPointer<QQuickView> view(SailfishApp::createView());
-     view->setSource(SailfishApp::pathTo("qml/harbour-d1webclient.qml"));
+    QScopedPointer<QQuickView> view(SailfishApp::createView());
+    Webclient *w = new Webclient();
+    ControlListModel *bModel = new  ControlListModel();
 
-
-     view->show();
+    app->connect(w,SIGNAL(received(QString,QString,int)),bModel,SLOT(received(QString,QString,int)));
+    view->rootContext()->setContextProperty("webclient",w);
+    view->rootContext()->setContextProperty("bModel",bModel);
+    view->rootContext()->setContextProperty("settings",settings);
+    view->setSource(SailfishApp::pathTo("qml/harbour-d1webclient.qml"));
+    QObject *object = view->rootObject();
+    QVariant returnedValue;
+    QMetaObject::invokeMethod(object, "pushAttached",
+            Q_RETURN_ARG(QVariant, returnedValue),
+            Q_ARG(QVariant, "pages/ThirdPage.qml"));
+    view->show();
+    QObject *wv = object->findChild<QObject*>("webViewObj");
+    app->connect(w,&Webclient::httpDone,[=](QNetworkReply* r) {
+          QMetaObject::invokeMethod(wv, "loadHtml",
+                Q_ARG(QString, r->readAll()),
+                Q_ARG(QUrl,QUrl(r->request().url())));
+          r->close();
+          emit w->httpRead();
+    } );
     return app->exec();
-
-    //
-
 }

@@ -32,30 +32,41 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "pages"
 import "cover"
-import harbour.computer.schmitz 1.0
 
 
 ApplicationWindow
 {
-property string mStatus: ""
-property string mQuery: ""
+    property int mIndex;
+    property int mListIndex;
+    property string mAction;
     id:rootWindow
     initialPage: Component { FirstPage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
-    Webclient {
-        id:webClient
-        onReceived:{
-        mStatus = status
-        mQuery = query
-        }
-    }
+    objectName: "rootWindow"
+function pushAttached(page) {
 
-
-function getUrlText() {
-    return mQuery;
+    pageStack.pushAttached(Qt.resolvedUrl(page));
+    return true;
 }
-function getStatusText() {
-    return mStatus;
+
+function setIndex(index) {
+    mIndex = index;
+}
+function getIndex() {
+    return mIndex;
+}
+function setAction(action) {
+    mAction= action;
+}
+function getAction() {
+    return mAction;
+}
+function setListIndex(index) {
+    mListIndex = index;
+}
+function getListIndex() {
+    return mListIndex;
 }
     allowedOrientations: defaultAllowedOrientations
+
 }

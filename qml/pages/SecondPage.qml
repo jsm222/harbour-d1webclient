@@ -31,23 +31,33 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-
 Dialog {
     id: dialog
     onAccepted: {
-        webClient.setValue("webclient/baseUrl",myTextField.text)
-        webClient.setValue("webclient/path",path.text);
-        webClient.setValue("webclient/queryOn",queryOn.text);
-        webClient.setValue("webclient/queryOff",queryOff.text);
+        var i = getIndex();
+        if(getAction() === "copy") {
+            i = bModel.nextIndex()
+        }
+
+        settings.setValue(("webclient%1/sectionHeader").arg(i),mySectionHeader.text !== "" ? mySectionHeader.text : qsTr("DefaultSection"))
+        settings.setValue(("webclient%1/getUrl").arg(i),getUrl.text)
+        settings.setValue(("webclient%1/buttonText").arg(i),button1.text !== "" ? button1.text : qsTr("New control %1").arg(i));
+        settings.setValue(("webclient%1/username").arg(i),username.text);
+        settings.setValue(("webclient%1/password").arg(i),password.text);
+        if(cBox.value == "CoverOn") settings.setValue("CoverOn",i);
+        if(cBox.value == "CoverOff") settings.setValue("CoverOff",i);
+
+
+        bModel.settingsChanged(i,getListIndex());
+
     }
+
     // The effective value will be restricted by ApplicationWindow.allowedOrientations
     allowedOrientations: Orientation.All
-
     SilicaFlickable {
         anchors.fill: parent
         // Tell SilicaFlickable the height of its content.
         contentHeight: column.height
-
         // Place our content in a Column.  The PageHeader is always placed at the top
         // of the page, followed by our content.
         Column {
@@ -57,77 +67,134 @@ Dialog {
             spacing: Theme.paddingLarge
 
             DialogHeader {
-                title: qsTr("Settings")
+                title: qsTr("Request settings")
 
             }
             TextField {
-                id:myTextField
+                id:mySectionHeader
                 Label {
-                    text: qsTr('Base url:')
+                    text: qsTr('Section text:')
                     width: parent.width
                     anchors.bottom:parent.top
 
-                    }
+                }
                 width:parent.width
-                text: webClient.value("webclient/baseUrl") ? webClient.value("webclient/baseUrl") : ""
-                placeholderText: qsTr("http://192.168.1.1/")
+                text:settings.value("webclient%1/sectionHeader".arg(getIndex())) ? settings.value("webclient%1/sectionHeader".arg(getIndex())) : ""
+                placeholderText: qsTr("Section")
+                color: Theme.secondaryHighlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                EnterKey.enabled: text.length >0
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: getUrl.focus = true
+
+
+            }
+            TextField {
+                id:getUrl
+                Label {
+                    text: qsTr('Url')
+                    width: parent.width
+                    anchors.bottom:parent.top
+
+                }
+                EnterKey.enabled: true
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: username.focus = true
+                width:parent.width
+                text: settings.value("webclient%1/getUrl".arg(getIndex())) ? settings.value("webclient%1/getUrl".arg(getIndex())) : ""
+                placeholderText:"http://192.168.1.1/LED/ACTION=ON"
+                color: Theme.secondaryHighlightColor
+                font.pixelSize: Theme.fontSizeSmall
+
+
+            }
+            TextField {
+                id:username
+                Label {
+                    text: qsTr('Username')
+                    width: parent.width
+                    anchors.bottom:parent.top
+
+                }
+                EnterKey.enabled: true
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: password.focus = true
+                width:parent.width
+                text: settings.value("webclient%1/username".arg(getIndex())) ? settings.value("webclient%1/username".arg(getIndex())) : ""
+                placeholderText:"user"
+                color: Theme.secondaryHighlightColor
+                font.pixelSize: Theme.fontSizeSmall
+
+
+            }
+            TextField {
+                id:password
+                Label {
+                    text: qsTr('Password')
+                    width: parent.width
+                    anchors.bottom:parent.top
+
+
+                }
+                echoMode:TextInput.PasswordEchoOnEdit
+                EnterKey.enabled: true
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: button1.focus = true
+                width:parent.width
+                text: settings.value("webclient%1/password".arg(getIndex())) ? settings.value("webclient%1/password".arg(getIndex())) : ""
+                placeholderText:"password"
+                color: Theme.secondaryHighlightColor
+                font.pixelSize: Theme.fontSizeSmall
+
+
+            }
+
+
+
+
+            TextField {
+                id:button1
+                Label {
+                    text: qsTr('Text')
+                    width: parent.width
+                    anchors.bottom:parent.top
+
+                }
+                width:parent.width
+                text: settings.value("webclient%1/buttonText".arg(getIndex())) ? settings.value("webclient%1/buttonText".arg(getIndex())) : ""
+                placeholderText: qsTr("On")
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
 
 
 
             }
-            TextField {
-                id:path
-                Label {
-                    text: qsTr('path:')
-                    width: parent.width
-                    anchors.bottom:parent.top
+            ComboBox {
+                id:cBox
+                label : "CoverAction"
+                currentIndex: getCboxIndex()
+                menu: ContextMenu {
+                       MenuItem { text: "None" }
+                       MenuItem { text: "CoverOn" }
+                       MenuItem { text: "CoverOff" }
 
-                    }
-                width:parent.width
-                text: webClient.value("webclient/path") ? webClient.value("webclient/path") : ""
-                placeholderText: qsTr("/LED")
-                color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeSmall
-
-
-
+                   }
             }
-            TextField {
-                id:queryOn
-                Label {
-                    text: qsTr('query on')
-                    width: parent.width
-                    anchors.bottom:parent.top
 
-                    }
-                width:parent.width
-                text: webClient.value("webclient/queryOn") ? webClient.value("webclient/queryOn") : ""
-                placeholderText: qsTr("?ACTION=ON")
-                color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeSmall
-
-
-
-            }
-            TextField {
-                id:queryOff
-                Label {
-                    text: qsTr('query off')
-                    width: parent.width
-                    anchors.bottom:parent.top
-
-                    }
-                width:parent.width
-                text: webClient.value("webclient/queryOff") ? webClient.value("webclient/queryOff") : ""
-                placeholderText: qsTr("?ACTION=OFF")
-                color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeSmall
-
-
-
-            }
-        }
+         }
     }
+    function getCboxIndex() {
+      if(getAction() === "edit") {
+
+        if(parseInt(settings.value("CoverOn")) === getIndex()) {
+            return 1;
+        }
+        else if(parseInt(settings.value("CoverOff")) === getIndex()) {
+            return 2;
+        }
+
+    }
+      return 0;
+    }
+
 }

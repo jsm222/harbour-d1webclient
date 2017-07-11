@@ -1,0 +1,18 @@
+# Rename this file as harbour-d1webclient.changes to include changelog
+# entries in your RPM file.
+#
+# Add new changelog entries following the format below.
+# Add newest entries to the top of the list.
+# Separate entries from eachother with a blank line.
+
+# * date Author's Name <author's email> version-release
+# - Summary of changes
+
+* Tue Jul 11 2017 Jesper Schmitz Mouridsen <jesper@schmitz.computer> 0.2-1
+- Custom list items with http get actions.
+- Load output of request in webview. (but do not make the request in webview)
+- Custom section names for list items.
+- Open in external browser.
+- Remove all list items with same section.
+- Remove, copy, edit and add a list item.
+- Convert old settings to new version.
